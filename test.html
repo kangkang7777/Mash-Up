@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>城府</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+<div id="container" style="position:relative"></div>
+
+<div class="row" style="position:absolute;top:10px;left:10px;">
+    <div class="col s12 m5">
+        <div class="card-panel ">
+            <h5 id="gralInfo"></h5>
+            <p id="wikiResult" class="black-text"></p>
+        </div>
+    </div>
+</div>
+
+<div class="row" style=" margin-top:200px; position:absolute;top:10px;left:10px;">
+    <div class="col s12 m11">
+        <div class="card-panel ">
+            <h5 id="logoInfo"></h5>
+            <p id="bingResult" class="black-text"></p>
+        </div>
+    </div>
+</div>
+
+<div class="row" style=" margin-top:450px; position:absolute;top:10px;left:10px;">
+    <div class="col s12 m11">
+        <div class="card-panel ">
+            <h5 id="weaInfo"></h5>
+            <p id="cityResult" class="black-text"></p>
+            <p id="timeResult" class="black-text"></p>
+            <p id="weaResult" class="black-text"></p>
+            <p id="fxResult" class="black-text"></p>
+            <p id="tipResult" class="black-text"></p>
+        </div>
+    </div>
+</div>
+
+<div class="input-card" style="width:24rem; height: 14rem">
+    <h4>设置地图当前行政区</h4>
+    <div class="input-item">
+        <input id='city-name' placeholder="北京市" type="text" style="margin-right:1rem;">
+        <button class="btn" id="query">去指定城市</button>
+    </div>
+</div>
+
+<script src="https://webapi.amap.com/maps?v=1.4.15&key=937d60a39226e298024fae7dfac24188"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+<script>
+    var val = "北京市";
+    var perimeters = window.location.search;
+    perimeters = decodeURI(perimeters.substr(1).split('&')[0]);
+
+    var map = new AMap.Map('container', {
+        resizeEnable: true,
+        center: [115.405285,39.904989]
+    });
+
+    //根据cityname、adcode、citycode设置地图位置
+    function gotoCity() {
+         val = document.querySelector('#city-name').value; //可以是cityname、adcode、citycode
+
+        if (!val) {
+            val = "北京市";
+        }
+        map.setCity(val);
+        log.info(`已跳转至${val}`);
+    }
+
+    //绑定查询点击、回车事件
+    document.querySelector('#query').onclick = gotoCity;
+    document.querySelector('#city-name').onkeydown = function(e) {
+        if (e.keyCode === 13) {
+
+
+            $("#error").html("");
+            $("#cityTitle").html("");
+            $("#wikiResult").html("");
+            $("#bingResult").html("");
+            $("#govResult").html("");
+            $("#news").html("");
+            $("#cityResult").html("");
+            $("#timeResult").html("");
+            $("#weaResult").html("");
+            $("#fxResult").html("");
+            $("#tipResult").html("");
+            $("#gralInfo").html("");
+            $("#logoInfo").html("");
+            $("#weaInfo").html("");
+            gotoCity();
+            wikipedia();
+            bingInfo();
+            weather();
+            return false;
+        }
+        return true;
+    };
+
+    var title;
+    var wikipedia = function()
+    {
+        var url = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=City:"+ val +"&format=json&callback=?";
+        var searchValues;
+        var bestMatch;
+        var wikiContent;
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            contentType: "application/json",
+            async: false,
+            dataType: "json",
+            success: function (data, status, jqXHR) {
+
+                searchValues = Object.values(data)[2];
+                if(searchValues!=null)
+                {
+                    //Wikipedia information
+                    bestMatch = Object.values(searchValues)[1][0];
+                    wikiContent = Object.values(bestMatch)[5];
+                    title = Object.values(bestMatch)[1];
+
+                    $("#wikiResult").prepend(wikiContent + '<a id="wikiLink" class="red-text" href="https://en.wikipedia.org/wiki/'+title+'"> ...Wikipedia</a>');
+                    $("#cityTitle").prepend(title);
+                    $("#gralInfo").prepend("维基简介")
+                }
+                else
+                {
+                    $("#error").prepend("<h4 class='red-text center'> Ciudad no encontrada </h4>");
+                    found = false;
+                }
+                finishFlag = true;
+            }
+        });
+    }
+    var bingInfo = function()
+    {
+        var url = "http://dev.virtualearth.net/REST/v1/Locations?"+
+            "query="+val+"&"+
+            "includeNeighborhood="+
+            "&include="+
+            "&maxResults=1"+
+            "&key=AiztiSSMdcvTJQVeSF8H0eNcHHnZ1iSnA3w9DrnS673NiZ88pDya-rAl4eoG-PoS";
+        var bingContent;
+        var bingData;
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (data, status, jqXHR) {
+                //Bing information
+                bingContent = Object.values(data);
+                lat = bingContent[3][0].resources[0].point.coordinates[0];
+                long = bingContent[3][0].resources[0].point.coordinates[1];
+
+                bingData = "<b>国家: </b>"+ bingContent[3][0].resources[0].address.countryRegion + "<br>" +
+                    "<b>位置: </b>"+ bingContent[3][0].resources[0].address.locality + "<br>" +
+                    "<b>类型: </b>"+ bingContent[3][0].resources[0].entityType + "<br>" +
+                    "<b>坐标: </b>"+bingContent[3][0].resources[0].point.coordinates;
+
+                $("#bingResult").prepend(bingData + '<a id="bingLink" class="red-text" href="https://www.bing.com/search?q='+val+'"> ...Bing</a>');
+                $("#logoInfo").prepend("必应搜索");
+
+                finishFlag = true;
+            }
+        });
+    }
+    var weather = function()
+    {
+        var url = "http://wthrcdn.etouch.cn/WeatherApi?city="+val;
+        $.ajax({
+            url:url,
+            dataType:"XML",
+            success: function(data){
+                var city = $(data).find("city");
+                var time = $(data).find("date");//1
+                var temper = $(data).find("high");
+                var fengxiang = $(data).find("fengxiang");
+                var detail = $(data).find("detail");
+
+                $("#cityResult").prepend(city.eq(0).text());
+                $("#timeResult").prepend(time.eq(0).text());
+                $("#weaResult").prepend(temper.eq(0).text());
+                $("#fxResult").prepend(fengxiang.eq(0).text());
+                $("#tipResult").prepend(detail.eq(0).text());
+
+                $("#weaInfo").prepend("天气预报");
+            }
+        });
+    }
+    weather();
+    wikipedia();
+    bingInfo();
+
+</script>
+</body>
+
+</html>

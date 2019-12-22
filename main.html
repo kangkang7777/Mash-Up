@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="container" style="position:relative"></div>
+<div class="info">
+    <div class="input-item">
+        <div class="input-item-prepend">
+            <span class="input-item-text" style="width:8rem;">请输入关键字</span>
+        </div>
+        <input id='tipinput' type="text">
+    </div>
+</div>
+<!--<div class="row" style="position:absolute;top:10px;left:10px;">-->
+<!--    <div class="col s12 ">-->
+<!--        <div class="card blue-grey darken-1">-->
+<!--            <div class="card-content white-text">-->
+<!--                <span class="card-title">输入城市名称：</span>-->
+<!--                <div class="input-field inline">-->
+<!--                    <input id="email" type="email" class="validate">-->
+<!--                    <label for="email" data-error="wrong" data-success="right">上海</label>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!-- 加载地图JSAPI脚本 -->
+<script src="https://webapi.amap.com/maps?v=1.4.15&key=937d60a39226e298024fae7dfac24188"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+<script src="js/materialize.min.js"></script>
+<script>
+    var map = new AMap.Map('container', {
+        resizeEnable: true, //是否监控地图容器尺寸变化
+        center: [116.397428, 39.90923] //初始化地图中心点
+    });
+    var auto = new AMap.Autocomplete({
+        input: "tipinput"
+    });
+</script>
+
+
+</body>
+</html>
